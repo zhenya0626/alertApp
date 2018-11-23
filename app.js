@@ -128,16 +128,23 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                     console.log('isClassTime().A202',isClassTime().A202);
                     console.log('!intervalTime',!intervalTime);
                 } else {
-                    changeRoomState(1,1);
+                    changeRoomState(1,1).then(console.log('53')).catch(function(error){console.log('error53', error)})
                     PostAlert();
                 }
 
             } else if(rows[0].state === 1) {
                 console.log('state 1')
                 if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 ){
-                    changeRoomState(1,0);
-                    setAllUserStateSql(0);
-                    PushMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。');
+                    changeRoomState(1,0).then(console.log('52')).catch(function(error){console.log('error52', error)})
+                    console.log('!!!!!!55')
+                    setAllUserStateSql(0)
+                    console.log('!!!!!!56')
+
+                    PushMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。')
+                    .then(console.log('58'))
+                    .catch(function(error){console.log('error58', error)})
+                    console.log('!!!!!!57')
+                
                 } else if (!intervalTime) {
                     PostAlert();
                 }
@@ -161,8 +168,9 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
             }
         });
     }
-    connection.end();
+    
 });
+// connection.end();
 function isClassTime() {
     let now = new Date();
     console.log('now.getDay', now.getDay());
@@ -220,6 +228,7 @@ const changeRoomState = function (roomId, state) {
     let postData = {
         "state": state,
     };
+    console.log('!!!!!!54')
     
     let postDataStr = JSON.stringify(postData);
     let options = {
@@ -356,6 +365,7 @@ const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
 }
 
 const setAllUserStateSql = (state) => {
+    console.log('!!!!!!56')
     let setUserStateSql = `update user set state=${state};`;
     connection.query(setUserStateSql, (err, rows, fields) => {
         if (err) throw err;
