@@ -134,11 +134,10 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
 
             } else if(rows[0].state === 1) {
                 console.log('state 1')
-
                 if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 ){
                     changeRoomState(1,0);
                     setAllUserStateSql(0);
-                    PushMessage('kesanakuteiiyo');
+                    PushMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。');
                 } else if (!intervalTime) {
                     PostAlert();
                 }
@@ -147,17 +146,16 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                 if((out['ai'][0] + out['ai'][1]) === '0.000.00'){
                     changeRoomState(1,0);
                     setAllUserStateSql(0);
-                    PushMessage('kesitekurete arigato');
+                    PushMessageOne(userId, '電気が消灯されました。ありがとうございました。');
+                    multicastClientSendMessageExceptForOne(userId, '電気が消灯されました！ご協力ありがとうございました。');
                 } else if ((out['ai'][0] + out['ai'][1]) !== '0.000.00') {
-
                     let sql3 = `select userId from user where state=3;`;
                     connection.query(sql3, (err, rows, fields) => {
                       if (err) throw err;
                         console.log('userId', rows[0].userId);
                         const userId = rows[0].userId;
                         changeRoomState(1,1);
-                        PushMessageOne(userId);
-                        multicastClientSendMessageExceptForOne(userId, 'kiemasita arigato');
+                        PushMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
                     });
                 }
             }
@@ -301,8 +299,6 @@ const PushMessage = function (message) {
             "Content-Length": postDataStr.length
         },
     };
-    
-
     console.log(message);
     return new Promise((resolve, reject) => {
         let req = https.request(options, (res) => {
@@ -323,29 +319,41 @@ const PushMessage = function (message) {
         req.end();
     });
 };
+const PushMessageOne = (userId, textMessage) => {
+  SendMessageObject = [
+    {
+      type: 'text',
+      text: textMessage
+    }];
+    // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+    multicastClientSendMessage([userId], SendMessageObject)  //test
+    .then((body)=>{
+        console.log(body);
+    },(e)=>{console.log(e)});
+}
 const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
-    let sql3 = `select userId from user;`;
-    connection.query(sql3, (err, rows, fields) => {
-      if (err) throw err;
-      console.log('userId', rows);
-      let userIdArray = [];
-      rows.forEach(element => {
-        if(element.userId !== userId){
-            userIdArray.push(element.userId);
-        }
-      });
-      SendMessageObject = [
-        {
-          type: 'text',
-          text: textMessage
-        }];
-        // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-        multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
-        .then((body)=>{
-            console.log(body);
-        },(e)=>{console.log(e)});
+  let sql3 = `select userId from user;`;
+  connection.query(sql3, (err, rows, fields) => {
+    if (err) throw err;
+    console.log('userId', rows);
+    let userIdArray = [];
+    rows.forEach(element => {
+      if(element.userId !== userId){
+          userIdArray.push(element.userId);
+      }
     });
-  }
+    SendMessageObject = [
+      {
+        type: 'text',
+        text: textMessage
+      }];
+      // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+      multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+      .then((body)=>{
+          console.log(body);
+      },(e)=>{console.log(e)});
+  });
+}
 
 const setAllUserStateSql = (state) => {
     let setUserStateSql = `update user set state=${state};`;
