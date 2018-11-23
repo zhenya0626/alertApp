@@ -18,61 +18,64 @@ connection.connect();
 
 let out = 
 { trend_p1: 
-   { '1_year': null,
-     '1_mon': null,
-     '1_day': null,
-     '1_hour':null,
-     '1_min': null,
-     '1_ch1': null,
-     '1_ch2': null,
-     '1_ch3': null,
-     '1_ch4': null},
+  { '1_year': null,
+      '1_mon': null,
+      '1_day': null,
+      '1_hour':null,
+      '1_min': null,
+      '1_ch1': null,
+      '1_ch2': null,
+      '1_ch3': null,
+      '1_ch4': null
+  },
   trend_p2: 
-   { '2_year': null ,
-     '2_mon': null,
-     '2_day':null,
-     '2_hour':null,
-     '2_min':null ,
-     '2_ch1':null ,
-     '2_ch2':null ,
-     '2_ch3':null ,
-     '2_ch4':null  },
+  { '2_year': null ,
+    '2_mon': null,
+    '2_day':null,
+    '2_hour':null,
+    '2_min':null ,
+    '2_ch1':null ,
+    '2_ch2':null ,
+    '2_ch3':null ,
+    '2_ch4':null  
+  },
   trend_p3: 
-   { '3_year':null ,
-     '3_mon':null ,
-     '3_day':null ,
-     '3_hour':null ,
-     '3_min':null ,
-     '3_ch1':null ,
-     '3_ch2':null ,
-     '3_ch3':null ,
-     '3_ch4':null  },
+  { '3_year':null ,
+    '3_mon':null ,
+    '3_day':null ,
+    '3_hour':null ,
+    '3_min':null ,
+    '3_ch1':null ,
+    '3_ch2':null ,
+    '3_ch3':null ,
+    '3_ch4':null  
+  },
   trend_p4: 
-   { '4_year':null ,
-     '4_mon':null ,
-     '4_day':null ,
-     '4_hour':null ,
-     '4_min':null ,
-     '4_ch1':null ,
-     '4_ch2':null ,
-     '4_ch3':null ,
-     '4_ch4':null  },
+  { '4_year':null ,
+    '4_mon':null ,
+    '4_day':null ,
+    '4_hour':null ,
+    '4_min':null ,
+    '4_ch1':null ,
+    '4_ch2':null ,
+    '4_ch3':null ,
+    '4_ch4':null  },
   ai: 
-   [ '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '',
-     '' ] }
+    [ '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '',
+      '' ] }
 
 for(let p = 1; p<5; p++){
 console.log("p",p);
@@ -109,28 +112,16 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
         let ai = text.slice( start + str[i].length + 4 , end-1 );
         ai = ai.replace(/"/g,'');
         ai = ai.split(',');
-        console.log(str[i], ai);
         out = Object.assign(out,{ai:ai});
         console.log('out',out);
-
-        var toString = Object.prototype.toString
-        let now = new Date(out['trend_p1']['1_year'],out['trend_p1']['1_mon']-1,out['trend_p1']['1_day']);
-        console.log('now', now);
-        let dayofnum = (now.getDay() === 0)? 7: now.getDay()
-        console.log('dayofnum', dayofnum);
-        console.log('type',out);
-        
 
         let sql2 =`select state,alerted_at from rooms where name='A202';`; 
             connection.query(sql2, (err, rows, fields) => {
             if (err) throw err;
             const alerted_at = moment(rows[0].alerted_at);
-
             const nowTime = moment();
-            
             const intervalTime = (nowTime.diff(alerted_at, 'hours') < 1) ? true : false;
 
-            
             if(rows[0].state === 0) {
                 console.log('state 0')
                 if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 || intervalTime){
@@ -167,16 +158,12 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                         changeRoomState(1,1);
                         PushMessageOne(userId);
                         multicastClientSendMessageExceptForOne(userId, 'kiemasita arigato');
-
                     });
-
                 }
             }
         });
-
-       
     }
-     connection.end();
+    connection.end();
 });
 function isClassTime() {
     let now = new Date();
@@ -365,6 +352,5 @@ const setAllUserStateSql = (state) => {
     connection.query(setUserStateSql, (err, rows, fields) => {
         if (err) throw err;
     });
-   
 }
 
