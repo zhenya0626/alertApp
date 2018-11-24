@@ -13,94 +13,8 @@ const connection = mysql.createConnection({
     database : 'vems'
 });
 
-
-connection.connect();
-
-let out = 
-{ trend_p1: 
-  { '1_year': null,
-      '1_mon': null,
-      '1_day': null,
-      '1_hour':null,
-      '1_min': null,
-      '1_ch1': null,
-      '1_ch2': null,
-      '1_ch3': null,
-      '1_ch4': null
-  },
-  trend_p2: 
-  { '2_year': null ,
-    '2_mon': null,
-    '2_day':null,
-    '2_hour':null,
-    '2_min':null ,
-    '2_ch1':null ,
-    '2_ch2':null ,
-    '2_ch3':null ,
-    '2_ch4':null  
-  },
-  trend_p3: 
-  { '3_year':null ,
-    '3_mon':null ,
-    '3_day':null ,
-    '3_hour':null ,
-    '3_min':null ,
-    '3_ch1':null ,
-    '3_ch2':null ,
-    '3_ch3':null ,
-    '3_ch4':null  
-  },
-  trend_p4: 
-  { '4_year':null ,
-    '4_mon':null ,
-    '4_day':null ,
-    '4_hour':null ,
-    '4_min':null ,
-    '4_ch1':null ,
-    '4_ch2':null ,
-    '4_ch3':null ,
-    '4_ch4':null  },
-  ai: 
-    [ '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '',
-      '' ] }
-
-for(let p = 1; p<5; p++){
-console.log("p",p);
-    fs.readFile('../dl/trend_p'+ p +'.js', 'utf8', function (err, text) {
-        let str = [];
-        let data = {};
-        str.push( p+"_year");
-        str.push( p+"_mon");
-        str.push( p+"_day");
-        str.push( p+"_hour");
-        str.push( p+"_min");
-        str.push( p+"_ch1");
-        str.push( p+"_ch2");
-        str.push( p+"_ch3");
-        str.push( p+"_ch4");
-        text = text.replace(/]/g,'');
-        for(let i = 0; i<str.length; i++){
-            let strLocation = text.indexOf( str[i] );
-            let end = text.slice(strLocation).search(/;/g) + strLocation;
-            let start = text.slice(strLocation,end).lastIndexOf(',') + strLocation + 1;
-            let tmp  = text.slice( start, end );
-            data = Object.assign(data, {[str[i]]: parseFloat(tmp)});
-        }
-        out = Object.assign(out, {['trend_p'+p]: data});
-    });
+let out = { 
+  ai: [ '', '', '', '', '', '', '', '', '', '', '', '', '', '', '' ],
 }
 
 fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
@@ -114,63 +28,71 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
         ai = ai.split(',');
         out = Object.assign(out,{ai:ai});
         console.log('out',out);
-
-        let sql2 =`select state,alerted_at from rooms where name='A202';`; 
-            connection.query(sql2, (err, rows, fields) => {
-            if (err) throw err;
-            const alerted_at = moment(rows[0].alerted_at);
-            const nowTime = moment();
-            const intervalTime = (nowTime.diff(alerted_at, 'hours') < 1) ? true : false;
-
-            if(rows[0].state === 0) {
-                console.log('state 0')
-                if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 || intervalTime){
-                    console.log('isClassTime().A202',isClassTime().A202);
-                    console.log('!intervalTime',!intervalTime);
-                } else {
-                    changeRoomState(1,1).then(console.log('53')).catch(function(error){console.log('error53', error)})
-                    PostAlert();
-                }
-
-            } else if(rows[0].state === 1) {
-                console.log('state 1')
-                if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 ){
-                    changeRoomState(1,0).then(console.log('52')).catch(function(error){console.log('error52', error)})
-                    console.log('!!!!!!55')
-                    setAllUserStateSql(0)
-                    console.log('!!!!!!56')
-
-                    PushMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。')
-                    .then(console.log('58'))
-                    .catch(function(error){console.log('error58', error)})
-                    console.log('!!!!!!57')
-                
-                } else if (!intervalTime) {
-                    PostAlert();
-                }
-            } else if(rows[0].state === 2) {
-                console.log('state2 0');
-                if((out['ai'][0] + out['ai'][1]) === '0.000.00'){
-                    changeRoomState(1,0);
-                    setAllUserStateSql(0);
-                    PushMessageOne(userId, '電気が消灯されました。ありがとうございました。');
-                    multicastClientSendMessageExceptForOne(userId, '電気が消灯されました！ご協力ありがとうございました。');
-                } else if ((out['ai'][0] + out['ai'][1]) !== '0.000.00') {
-                    let sql3 = `select userId from user where state=3;`;
-                    connection.query(sql3, (err, rows, fields) => {
-                      if (err) throw err;
-                        console.log('userId', rows[0].userId);
-                        const userId = rows[0].userId;
-                        changeRoomState(1,1);
-                        PushMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
-                    });
-                }
-            }
-        });
     }
-    
+
+    connection.connect();
+    let sql2 =`select state,alerted_at from rooms where name='A202';`; 
+        connection.query(sql2, (err, rows, fields) => {
+        if (err) throw err;
+        const alerted_at = moment(rows[0].alerted_at);
+        const nowTime = moment();
+        const intervalTime = (nowTime.diff(alerted_at, 'hours') < 1) ? true : false;
+
+        if(rows[0].state === 0) {
+            console.log('state 0')
+            if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 || intervalTime){
+                console.log('isClassTime().A202',isClassTime().A202);
+                console.log('!intervalTime',!intervalTime);
+            } else {
+                console.log('state 0')
+                changeRoomState(1,1)
+                PostAlert();
+            }
+            return;
+        } else if(rows[0].state === 1) {
+            console.log('state 1')
+            console.log('intervalTime', intervalTime)
+            if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 ){
+                multicastTextMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。')
+                changeRoomState(1,0)
+                setAllUserState(0)
+
+            } else if (!intervalTime) {
+                PostAlert();
+            }
+        } else if(rows[0].state === 2) {
+            console.log('state 2');
+            let count3UserSql = `select COUNT(userId) AS count from user where state=3;`;
+            connection.query(count3UserSql, (err, users1, fields) => {
+                if (err) throw err;
+                if (users1[0].count == 0){ 
+                    console.log('ariena~i!!')
+                    return;
+                }
+                let select3UserSql = `select userId from user where state=3;`;
+                connection.query(select3UserSql, (err, users, fields) => {
+                    if (err) throw err;
+                    console.log('userId', users);
+                    const userId = users[0].userId;
+                        
+                    if((out['ai'][0] + out['ai'][1]) === '0.000.00'){
+                        setPointAndPushThanksMessage(userId, 5);
+                        multicastTextExceptForOne(userId, '電気が消灯されました！ご協力ありがとうございました。');
+                        changeRoomState(1,0);
+                        setAllUserState(0);
+                    } else if ((out['ai'][0] + out['ai'][1]) !== '0.000.00') {
+                        changeRoomState(1,1);
+                        changeUserState(userId, 0);
+                        PushTextMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
+                    }
+                });
+            });
+        }
+    });
+
+    // connection.end();
 });
-// connection.end();
+
 function isClassTime() {
     let now = new Date();
     console.log('now.getDay', now.getDay());
@@ -225,45 +147,23 @@ function isClassTime() {
 }
 
 const changeRoomState = function (roomId, state) {
-    let postData = {
-        "state": state,
-    };
-    console.log('!!!!!!54')
-    
-    let postDataStr = JSON.stringify(postData);
-    let options = {
-        host: 'ncuvems.sda.nagoya-cu.ac.jp',
-        port: 443,
-        path: `/rooms/${roomId}/state`,
-        method: 'POST',
-        headers : {
-            'Content-Type': 'application/json',
-            "Content-Length": postDataStr.length
-        },
-    };
-
-    return new Promise((resolve, reject) => {
-        let req = https.request(options, (res) => {
-          let body = '';
-          res.setEncoding('utf8');
-          res.on('data', (chunk) => {
-              body += chunk;
-          });
-          res.on('end', () => {
-              resolve(body);
-          });
-        });
-
-        req.on('error', (e) => {
-            reject(e);
-        });
-        req.write(postDataStr);
-        req.end();
+    let setUserStateSql = `update rooms set state=${state} where id=${roomId};`;
+    connection.query(setUserStateSql, (err, rows, fields) => {
+        if (err) throw err;
     });
 };
-
-
-
+const setAllUserState = (state) => {
+    let setUserStateSql = `update user set state=${state};`;
+    connection.query(setUserStateSql, (err, rows, fields) => {
+        if (err) throw err;
+    });
+}
+const changeUserState = (userId, state) => {
+    let setUserStateSql = `update user set state=${state} where userId='${userId}';`;
+    connection.query(setUserStateSql, (err, rows, fields) => {
+        if (err) throw err;
+    });
+}
 const PostAlert = function () {
     let options = {
         host: 'ncuvems.sda.nagoya-cu.ac.jp',
@@ -291,12 +191,15 @@ const PostAlert = function () {
     });
     
 };
-const PushMessage = function (message) {
+
+const multicastMessageObject = function (userIdArray, SendMessageObject) {
     let postData = {
-        "text": message,
+        userIdArray: userIdArray,
+        SendMessageObject: SendMessageObject,
     };
     
     let postDataStr = JSON.stringify(postData);
+    console.log('postDataStr', postDataStr);
 
     let options = {
         host: 'ncuvems.sda.nagoya-cu.ac.jp',
@@ -305,10 +208,9 @@ const PushMessage = function (message) {
         method: 'POST',
         headers : {
             'Content-Type': 'application/json',
-            "Content-Length": postDataStr.length
+            // "Content-Length": postDataStr.length
         },
     };
-    console.log(message);
     return new Promise((resolve, reject) => {
         let req = https.request(options, (res) => {
             let body = '';
@@ -328,19 +230,30 @@ const PushMessage = function (message) {
         req.end();
     });
 };
-const PushMessageOne = (userId, textMessage) => {
-  SendMessageObject = [
-    {
-      type: 'text',
-      text: textMessage
-    }];
-    // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-    multicastClientSendMessage([userId], SendMessageObject)  //test
-    .then((body)=>{
-        console.log(body);
-    },(e)=>{console.log(e)});
-}
-const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
+
+const multicastTextMessage = function (textMessage) {
+    let sql3 = `select userId from user;`;
+    connection.query(sql3, (err, rows, fields) => {
+        if (err) throw err;
+        console.log('userId', rows);
+        let userIdArray = [];
+        rows.forEach(element => {
+            userIdArray.push(element.userId);
+        });
+        const SendMessageObject = [
+        {
+            type: 'text',
+            text: textMessage
+        }];
+        // multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+        multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+        .then((body)=>{
+            console.log(body);
+        },(e)=>{console.log(e)});
+    });
+};
+
+const multicastTextExceptForOne = (userId, textMessage) => {
   let sql3 = `select userId from user;`;
   connection.query(sql3, (err, rows, fields) => {
     if (err) throw err;
@@ -351,24 +264,53 @@ const multicastClientSendMessageExceptForOne = (userId, textMessage) => {
           userIdArray.push(element.userId);
       }
     });
-    SendMessageObject = [
+    const SendMessageObject = [
       {
         type: 'text',
         text: textMessage
       }];
-      // multicastClientSendMessage(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-      multicastClientSendMessage(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
+      // multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+      multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be', 'U451892d8984210804955df6d5b32e8dd'], SendMessageObject)  //test
       .then((body)=>{
           console.log(body);
       },(e)=>{console.log(e)});
   });
 }
 
-const setAllUserStateSql = (state) => {
-    console.log('!!!!!!56')
-    let setUserStateSql = `update user set state=${state};`;
-    connection.query(setUserStateSql, (err, rows, fields) => {
+const PushTextMessageOne = (userId, textMessage) => {
+    const SendMessageObject = [
+    {
+        type: 'text',
+        text: `${textMessage}`
+    }];
+    multicastMessageObject([`${userId}`], SendMessageObject)
+    .then((body)=>{
+        console.log(body);
+    },(e)=>{console.log(e)});
+}
+  
+const setPointAndPushThanksMessage = (userId, point) => {
+    let sql = `update user set count = count + ${point} where userId='${userId}';`;
+    connection.query(sql, (err, rows, fields) => {
+    if (err) throw err;
+    let sql2 = `select *, (select count(*) + 1 from user b where b.count > a.count) as ranking from user a where userId='${userId}';`;
+    connection.query(sql2, (err, rows, fields) => {
         if (err) throw err;
+        let SendMessageObject = [{
+            type: 'text',
+            text: 'ありがとうございます!!'
+        },{
+            type: 'text',
+            text: `ランキング ${rows[0].ranking}位　現在の獲得ポイントは${rows[0].count*10}Pです。`
+        },{
+            type: 'text',
+            text: 'https://ncuvems.sda.nagoya-cu.ac.jp'
+        }];
+        multicastMessageObject([`${userId}`], SendMessageObject)
+        .then((body)=>{
+            console.log(body);
+        },(e)=>{console.log(e)});
+    });
     });
 }
 
