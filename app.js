@@ -41,12 +41,14 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
         if(rows[0].state === 0) {
             console.log('state 0')
             if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 || intervalTime){
+            // if(false){
                 console.log('isClassTime().A202',isClassTime().A202);
                 console.log('!intervalTime',!intervalTime);
             } else {
                 console.log('state 0')
                 changeRoomState(1,1)
                 PostAlert();
+                setLog(0,1,'alert');
             }
             return;
         } else if(rows[0].state === 1) {
@@ -56,8 +58,9 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                 multicastTextMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。')
                 changeRoomState(1,0)
                 setAllUserState(0)
-
+                setLog(1,0,'kesanakuteyoi');
             } else if (!intervalTime) {
+                setLog(1,1,'alert2');
                 PostAlert();
             }
         } else if(rows[0].state === 2) {
@@ -67,6 +70,7 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                 if (err) throw err;
                 if (users1[0].count == 0){ 
                     console.log('ariena~i!!')
+                    setLog(2,2,'ariena~i!!');
                     return;
                 }
                 let select3UserSql = `select userId from user where state=3;`;
@@ -80,10 +84,12 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                         multicastTextExceptForOne(userId, '電気が消灯されました！ご協力ありがとうございました。');
                         changeRoomState(1,0);
                         setAllUserState(0);
+                        setLog(2,0,'shoutoukakuninn');
                     } else if ((out['ai'][0] + out['ai'][1]) !== '0.000.00') {
                         changeRoomState(1,1);
                         changeUserState(userId, 0);
                         PushTextMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
+                        setLog(2,1,'not shoutoukakuninn');
                     }
                 });
             });
@@ -161,6 +167,18 @@ const setAllUserState = (state) => {
 const changeUserState = (userId, state) => {
     let setUserStateSql = `update user set state=${state} where userId='${userId}';`;
     connection.query(setUserStateSql, (err, rows, fields) => {
+        if (err) throw err;
+    });
+}
+const setLog = (room_state_prev, room_state_next, memo='') => {
+
+    let sql = `
+    insert into vems.logs
+    (is_server, room_state_prev, room_state_next, memo)
+    values
+    (1,${room_state_prev},${room_state_next},'${memo}')`;
+
+    connection.query(sql, (err, rows, fields) => {
         if (err) throw err;
     });
 }
