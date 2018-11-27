@@ -14,7 +14,7 @@ const connection = mysql.createConnection({
 });
 
 let out = { 
-  ai: [ '', '', '', '', '', '', '', '', '', '', '', '', '', '', '' ],
+    ai: [ '', '', '', '', '', '', '', '', '', '', '', '', '', '', '' ],
 }
 
 fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
@@ -87,7 +87,8 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                         multicastTextExceptForOne(userId, '電気が消灯されました！ご協力ありがとうございました。');
                         changeRoomState(1,0);
                         setAllUserState(0);
-                        setLog(2,0,'shoutoukakuninn');
+                        setLog(2,0,'消灯を確認しました');
+                        
                         changeRoomConfirm(1,0);
                     } else {
                         if (confirm == 0) {
@@ -96,7 +97,7 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                             changeRoomState(1,1);
                             changeUserState(userId, 0);
                             PushTextMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
-                            setLog(2,1,'not shoutoukakuninn');
+                            setLog(2,1,'消灯を確認できませんでした');
                         }
                     }
                 });
@@ -208,14 +209,14 @@ const PostAlert = function () {
     };
     return new Promise((resolve, reject) => {
         let req = https.request(options, (res) => {
-          let body = '';
-          res.setEncoding('utf8');
-          res.on('data', (chunk) => {
-              body += chunk;
-          });
-          res.on('end', () => {
-              resolve(body);
-          });
+            let body = '';
+            res.setEncoding('utf8');
+            res.on('data', (chunk) => {
+                body += chunk;
+            });
+            res.on('end', () => {
+                resolve(body);
+            });
         });
 
         req.on('error', (e) => {
@@ -249,13 +250,13 @@ const multicastMessageObject = function (userIdArray, SendMessageObject) {
     return new Promise((resolve, reject) => {
         let req = https.request(options, (res) => {
             let body = '';
-          res.setEncoding('utf8');
-          res.on('data', (chunk) => {
-              body += chunk;
-          });
-          res.on('end', () => {
-              resolve(body);
-          });
+            res.setEncoding('utf8');
+            res.on('data', (chunk) => {
+                body += chunk;
+            });
+            res.on('end', () => {
+                resolve(body);
+            });
         });
 
         req.on('error', (e) => {
@@ -289,27 +290,27 @@ const multicastTextMessage = function (textMessage) {
 };
 
 const multicastTextExceptForOne = (userId, textMessage) => {
-  let sql3 = `select userId from user;`;
-  connection.query(sql3, (err, rows, fields) => {
-    if (err) throw err;
-    console.log('userId', rows);
-    let userIdArray = [];
-    rows.forEach(element => {
-      if(element.userId !== userId){
-          userIdArray.push(element.userId);
-      }
+    let sql3 = `select userId from user;`;
+    connection.query(sql3, (err, rows, fields) => {
+        if (err) throw err;
+        console.log('userId', rows);
+        let userIdArray = [];
+        rows.forEach(element => {
+        if(element.userId !== userId){
+            userIdArray.push(element.userId);
+        }
+        });
+        const SendMessageObject = [
+        {
+            type: 'text',
+            text: textMessage
+        }];
+        multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+        //   multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
+        .then((body)=>{
+            console.log(body);
+        },(e)=>{console.log(e)});
     });
-    const SendMessageObject = [
-      {
-        type: 'text',
-        text: textMessage
-      }];
-      multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-    //   multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
-      .then((body)=>{
-          console.log(body);
-      },(e)=>{console.log(e)});
-  });
 }
 
 const PushTextMessageOne = (userId, textMessage) => {
@@ -323,7 +324,7 @@ const PushTextMessageOne = (userId, textMessage) => {
         console.log(body);
     },(e)=>{console.log(e)});
 }
-  
+
 const setPointAndPushThanksMessage = (userId, point) => {
     let sql = `update user set count = count + ${point} where userId='${userId}';`;
     connection.query(sql, (err, rows, fields) => {
