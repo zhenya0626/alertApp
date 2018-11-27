@@ -60,7 +60,7 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                 changeRoomState(1,0)
                 setAllUserState(0)
                 changeRoomConfirm(1,0);
-                setLog(1,0,'kesanakuteyoi');
+                setLog(1,0,'電気が消された or 授業が始まった');
             } else if (!intervalTime) {
                 setLog(1,1,'alert2');
                 PostAlert();
