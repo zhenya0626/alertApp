@@ -59,6 +59,7 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                 multicastTextMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。')
                 changeRoomState(1,0)
                 setAllUserState(0)
+                changeRoomConfirm(1,0);
                 setLog(1,0,'kesanakuteyoi');
             } else if (!intervalTime) {
                 setLog(1,1,'alert2');
@@ -88,7 +89,6 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                         changeRoomState(1,0);
                         setAllUserState(0);
                         setLog(2,0,'消灯を確認しました');
-                        
                         changeRoomConfirm(1,0);
                     } else {
                         if (confirm == 0) {
