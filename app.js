@@ -31,13 +31,13 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
     }
 
     connection.connect();
-    let sql2 =`select state,alerted_at from rooms where name='A202';`; 
+    let sql2 =`select state,alerted_at,confirm from rooms where name='A202';`; 
         connection.query(sql2, (err, rows, fields) => {
         if (err) throw err;
         const alerted_at = moment(rows[0].alerted_at);
         const nowTime = moment();
         const intervalTime = (nowTime.diff(alerted_at, 'hours') < 1) ? true : false;
-
+        const confirm = rows[0].confirm;
         if(rows[0].state === 0) {
             console.log('state 0')
             if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 || intervalTime){
@@ -79,18 +79,25 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
                     if (err) throw err;
                     console.log('userId', users);
                     const userId = users[0].userId;
-                        
+                    
+                    
                     if((out['ai'][0] + out['ai'][1]) === '0.000.00'){
+                    // if(false){
                         setPointAndPushThanksMessage(userId, 5);
                         multicastTextExceptForOne(userId, '電気が消灯されました！ご協力ありがとうございました。');
                         changeRoomState(1,0);
                         setAllUserState(0);
                         setLog(2,0,'shoutoukakuninn');
-                    } else if ((out['ai'][0] + out['ai'][1]) !== '0.000.00') {
-                        changeRoomState(1,1);
-                        changeUserState(userId, 0);
-                        PushTextMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
-                        setLog(2,1,'not shoutoukakuninn');
+                        changeRoomConfirm(1,0);
+                    } else {
+                        if (confirm == 0) {
+                            changeRoomConfirm(1,confirm+1);
+                        } else if(confirm > 0){
+                            changeRoomState(1,1);
+                            changeUserState(userId, 0);
+                            PushTextMessageOne(userId, '電気の消灯は確認できませんでした。もう一度消しに行く場合は『消しに行く』と入力してください。');
+                            setLog(2,1,'not shoutoukakuninn');
+                        }
                     }
                 });
             });
@@ -156,7 +163,12 @@ function isClassTime() {
 
     return tmpObj
 }
-
+const changeRoomConfirm = function (roomId, confirm) {
+    let setUserStateSql = `update rooms set confirm=${confirm} where id=${roomId};`;
+    connection.query(setUserStateSql, (err, rows, fields) => {
+        if (err) throw err;
+    });
+};
 const changeRoomState = function (roomId, state) {
     let setUserStateSql = `update rooms set state=${state} where id=${roomId};`;
     connection.query(setUserStateSql, (err, rows, fields) => {
