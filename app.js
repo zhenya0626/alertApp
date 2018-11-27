@@ -54,6 +54,7 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
         } else if(rows[0].state === 1) {
             console.log('state 1')
             console.log('intervalTime', intervalTime)
+            console.log('isClassTime().A202',isClassTime().A202)
             if(((out['ai'][0] + out['ai'][1]) === '0.000.00') || isClassTime().A202 ){
                 multicastTextMessage('電気が消灯された、もしくはその教室の授業が始まりましたので,電気を消さなくて大丈夫です。ご協力ありがとうございました。')
                 changeRoomState(1,0)
@@ -113,38 +114,42 @@ function isClassTime() {
     };
     // 2=ka
     if(dayOfWeek === 2) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        console.log('hour!',hour)
+        console.log('minute!',minute)
+        if ( hour==9 || (hour==10 && minute<=30) ){
             tmpObj.A202 = true;
             tmpObj.A203 = true;
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {
+            console.log('kokoko')
+        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {
             tmpObj.A202 = true;
             tmpObj.A203 = true;
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+            console.log('kokoyo')
+        } else if ( hour=13 || (hour==14 && minute<=30) ) {
 
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
 
         }
     // 3=sui
     } else if(dayOfWeek === 3) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( hour==9 || (hour==10 && minute<=30) ){
             tmpObj.A203 = true;
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {  
+        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10)) {  
             tmpObj.A203 = true;
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+        } else if ( hour=13 || (hour==14 && minute<=30) ) {
             tmpObj.A202 = true;
             tmpObj.A203 = true;
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
             tmpObj.A203 = true;
         }  
     // 4=moku 
     } else if(dayOfWeek === 3) {
-        if ( hour>=9 && (hour<=10 && minute<=30) ){
+        if ( hour==9 || (hour==10 && minute<=30) ){
 
-        } else if ( (hour>=10  && minute>=40)&& (hour<=12 && minute<=10) ) {  
+        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10)) {  
 
-        } else if ( (hour>=13  && minute>=0)&& (hour<=14 && minute<=30) ) {
+        } else if ( hour=13 || (hour==14 && minute<=30) ) {
             tmpObj.A202 = true;
-        } else if ( (hour>=14  && minute>=40)&& (hour<=16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
             tmpObj.A202 = true;
         }   
     }
