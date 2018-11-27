@@ -268,8 +268,8 @@ const multicastTextMessage = function (textMessage) {
             type: 'text',
             text: textMessage
         }];
-        // multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-        multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
+        multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+        // multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
         .then((body)=>{
             console.log(body);
         },(e)=>{console.log(e)});
@@ -292,8 +292,8 @@ const multicastTextExceptForOne = (userId, textMessage) => {
         type: 'text',
         text: textMessage
       }];
-      // multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-      multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
+      multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
+    //   multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
       .then((body)=>{
           console.log(body);
       },(e)=>{console.log(e)});
