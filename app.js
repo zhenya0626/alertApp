@@ -5,6 +5,7 @@ var https = require('https');
 var file = require('file-system');
 var fs = require('fs');
 var moment = require('moment');
+var test = true;
 const mysql = require('mysql');
 const connection = mysql.createConnection({
     host     : 'localhost',
@@ -281,11 +282,18 @@ const multicastTextMessage = function (textMessage) {
             type: 'text',
             text: textMessage
         }];
-        multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-        // multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
-        .then((body)=>{
-            console.log(body);
-        },(e)=>{console.log(e)});
+        if(test){
+            multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
+            .then((body)=>{
+                console.log(body);
+            },(e)=>{console.log(e)});
+        } else {
+            multicastMessageObject(userIdArray, SendMessageObject) 
+            .then((body)=>{
+                console.log(body);
+            },(e)=>{console.log(e)});
+        }
+        
     });
 };
 
@@ -305,11 +313,18 @@ const multicastTextExceptForOne = (userId, textMessage) => {
             type: 'text',
             text: textMessage
         }];
-        multicastMessageObject(userIdArray, SendMessageObject)  //sousinnsitahitoigai
-        //   multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
-        .then((body)=>{
-            console.log(body);
-        },(e)=>{console.log(e)});
+
+        if(test){
+            multicastMessageObject(['Ud12eabeb5d98614b70d2edbbd9fc67be'], SendMessageObject)  //test
+            .then((body)=>{
+                console.log(body);
+            },(e)=>{console.log(e)});
+        } else {
+            multicastMessageObject(userIdArray, SendMessageObject) 
+            .then((body)=>{
+                console.log(body);
+            },(e)=>{console.log(e)});
+        }
     });
 }
 
