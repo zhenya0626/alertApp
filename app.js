@@ -32,12 +32,15 @@ fs.readFile('../dl/data_ai.js', 'utf8', function (err, text) {
     }
 
     connection.connect();
-    let sql2 =`select state,alerted_at,confirm from rooms where name='A202';`; 
+    let sql2 =`select state,alerted_at,used_at,confirm from rooms where name='A202';`; 
         connection.query(sql2, (err, rows, fields) => {
         if (err) throw err;
         const alerted_at = moment(rows[0].alerted_at);
+        const used_at = moment(rows[0].used_at);
         const nowTime = moment();
-        const intervalTime = (nowTime.diff(alerted_at, 'hours') < 1) ? true : false;
+        const alert_intervalTime = (nowTime.diff(alerted_at, 'hours') < 1) ? true : false;
+        const used_intervalTime = (nowTime.diff(used_at, 'hours') < 1) ? true : false;
+        const intervalTime = alert_intervalTime || used_intervalTime;
         const confirm = rows[0].confirm;
         if(rows[0].state === 0) {
             console.log('state 0')
