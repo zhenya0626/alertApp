@@ -126,42 +126,38 @@ function isClassTime() {
     };
     // 2=ka
     if(dayOfWeek === 2) {
-        console.log('hour!',hour)
-        console.log('minute!',minute)
-        if ( hour==9 || (hour==10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) || (hour==10 && minute<=33) ){
             tmpObj.A202 = true;
             tmpObj.A203 = true;
-            console.log('kokoko')
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10) ) {
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {
             tmpObj.A202 = true;
             tmpObj.A203 = true;
-            console.log('kokoyo')
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57)|| (hour==14 && minute<=33)) {
 
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
 
         }
     // 3=sui
     } else if(dayOfWeek === 3) {
-        if ( hour==9 || (hour==10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) || (hour==10 && minute<=33) ){
             tmpObj.A203 = true;
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10)) {  
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13)) {  
             tmpObj.A203 = true;
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57)|| (hour==14 && minute<=33)) {
             tmpObj.A202 = true;
             tmpObj.A203 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
             tmpObj.A203 = true;
         }  
     // 4=moku 
     } else if(dayOfWeek === 3) {
-        if ( hour==9 || (hour==10 && minute<=30) ){
+        if ( (hour==8 && minute>=57) || (hour==10 && minute<=33) ){
 
-        } else if ( (hour==10  && minute>=40) || hour==11 || (hour==12 && minute<=10)) {  
+        } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13)) {  
 
-        } else if ( hour=13 || (hour==14 && minute<=30) ) {
+        } else if ( (hour==12 && minute>=57)|| (hour==14 && minute<=33)) {
             tmpObj.A202 = true;
-        } else if ( (hour==14  && minute>=40) || hour==15 || (hour==16 && minute<=10) ) {
+        } else if ( (hour==14  && minute>=37) || hour==15 || (hour==16 && minute<=13) ) {
             tmpObj.A202 = true;
         }   
     }
