@@ -5,7 +5,7 @@ var https = require('https');
 var file = require('file-system');
 var fs = require('fs');
 var moment = require('moment');
-var test = true;
+var test = false;
 const mysql = require('mysql');
 const connection = mysql.createConnection({
     host     : 'localhost',
