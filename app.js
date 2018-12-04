@@ -126,7 +126,7 @@ function isClassTime() {
     };
     // 2=ka
     if(dayOfWeek === 2) {
-        if ( (hour==8 && minute>=57) || (hour==10 && minute<=33) ){
+        if ( (hour==8 && minute>=57) || (hour==9) || (hour==10 && minute<=33) ){
             tmpObj.A202 = true;
             tmpObj.A203 = true;
         } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13) ) {
@@ -139,7 +139,7 @@ function isClassTime() {
         }
     // 3=sui
     } else if(dayOfWeek === 3) {
-        if ( (hour==8 && minute>=57) || (hour==10 && minute<=33) ){
+        if ( (hour==8 && minute>=57) || (hour==9) || (hour==10 && minute<=33) ){
             tmpObj.A203 = true;
         } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13)) {  
             tmpObj.A203 = true;
@@ -151,7 +151,7 @@ function isClassTime() {
         }  
     // 4=moku 
     } else if(dayOfWeek === 3) {
-        if ( (hour==8 && minute>=57) || (hour==10 && minute<=33) ){
+        if ( (hour==8 && minute>=57) || (hour==9) || (hour==10 && minute<=33) ){
 
         } else if ( (hour==10  && minute>=37) || hour==11 || (hour==12 && minute<=13)) {  
 
